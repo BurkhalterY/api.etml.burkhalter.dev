@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "etml-api"
+version = "0.1.0"
+description = ""
+authors = ["Yannis Burkhalter <yannis@burkhalter.dev>"]
+readme = "README.md"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+piccolo = {extras = ["postgres"], version = "^0.106.0"}
+strawberry-graphql = {extras = ["asgi"], version = "^0.156.4"}
+uvicorn = "^0.20.0"
+
+[tool.poetry.scripts]
+start = "app.main:start"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
