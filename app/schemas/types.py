@@ -27,7 +27,7 @@ class User:
         )
         return Promotion(
             id=record["id"],
-            cpde=record["cpde"],
+            code=record["code"],
             start_year=record["start_year"],
             end_year=record["end_year"],
         )

@@ -35,8 +35,6 @@ class Promotion(Table):
 
 
 class Profile(Table):
-    # Add some fields to table User
-    # Source: https://piccolo-orm.readthedocs.io/en/latest/piccolo/authentication/baseuser.html#extending-baseuser
     id = Serial(primary_key=True)
     user_id = ForeignKey(User)
     promotion_id = ForeignKey(Promotion)
