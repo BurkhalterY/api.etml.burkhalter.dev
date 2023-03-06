@@ -1,51 +1,57 @@
-from functools import cached_property
-from typing import Optional
+from typing import Any, Optional, Union
 
+import jwt
 import strawberry
+from starlette import requests, responses, websockets
+from strawberry.asgi import GraphQL as _GraphQL
 
-from app import models
+from app.models import User
 
-# from . import auth
+from . import agenda, auth, types
+
+
+class GraphQL(_GraphQL):
+    async def get_context(
+        self,
+        request: Union[requests.Request, websockets.WebSocket],
+        response: Optional[responses.Response] = None,
+    ) -> Any:
+        return {"user": await self.get_user(request)}
+
+    async def get_user(
+        self,
+        request: Union[requests.Request, websockets.WebSocket],
+        response: Optional[responses.Response] = None,
+    ) -> Optional[types.User]:
+        if not request:
+            return None
+
+        authorization = request.headers.get("Authorization", None)
+        if authorization is None:
+            return None
+
+        payload = jwt.decode(authorization, auth.SECRET, ["HS256"])
+        user = await User.select().where(User.id == int(payload["sub"])).first()
+        return (
+            types.User(
+                id=user["id"],
+                first_name=user["first_name"],
+                last_name=user["last_name"],
+                email=user["email"],
+            )
+            if user
+            else None
+        )
 
 
 @strawberry.type
-class User:
-    id: int
-
-    @cached_property
-    def record(self) -> strawberry.Private[Optional[models.User]]:
-        print("shit")
-        return models.User.select().where(models.User.id == self.id).first().run_sync()
-
-    @strawberry.field
-    async def first_name(self) -> Optional[str]:
-        if self.record:
-            return self.record["first_name"]
-        return None
-
-    @strawberry.field
-    async def last_name(self) -> Optional[str]:
-        if self.record:
-            return self.record["last_name"]
-        return None
-
-    @strawberry.field
-    async def email(self) -> Optional[str]:
-        if self.record:
-            return self.record["email"]
-        return None
+class Query(agenda.Query, auth.Query):
+    pass
 
 
 @strawberry.type
-class Query:
-    @strawberry.field
-    async def user(self, id: int) -> Optional[User]:
-        return User(id=id)
+class Mutation(auth.Mutation):
+    pass
 
 
-# @strawberry.type
-# class Mutation(auth.Mutation):
-#     pass
-
-
-schema = strawberry.Schema(Query)
+schema = strawberry.Schema(Query, Mutation)

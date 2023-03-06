@@ -1,7 +1,7 @@
 from enum import Enum
 
 from piccolo.apps.user.tables import BaseUser as User
-from piccolo.columns import Date, ForeignKey, Integer, Serial, Text, Varchar
+from piccolo.columns import Boolean, Date, ForeignKey, Integer, Serial, Text, Varchar
 from piccolo.table import Table
 
 MATTERS = [
@@ -38,6 +38,7 @@ class Profile(Table):
     id = Serial(primary_key=True)
     user_id = ForeignKey(User)
     promotion_id = ForeignKey(Promotion)
+    public = Boolean()
 
 
 class Task(Table):
