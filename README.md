@@ -1,6 +1,6 @@
 # api.etml.burkhalter.dev
 
-The backend of [etml.burkhalter.dev](../etml.burkhalter.dev)
+The backend of [etml.burkhalter.dev](https://github.com/BurkhalterY/etml.burkhalter.dev)
 
 ## Installation
 
