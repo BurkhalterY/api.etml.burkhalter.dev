@@ -16,9 +16,9 @@ class GraphQL(_GraphQL):
         request: Union[requests.Request, websockets.WebSocket],
         response: Optional[responses.Response] = None,
     ) -> Any:
-        return {"user": await self.get_user(request)}
+        return {"user": await self._get_user(request)}
 
-    async def get_user(
+    async def _get_user(
         self,
         request: Union[requests.Request, websockets.WebSocket],
         response: Optional[responses.Response] = None,
