@@ -2,9 +2,8 @@ from datetime import date, timedelta
 from typing import List, Optional
 
 import strawberry
-from strawberry.types import Info
 
-from app.models import Matter, Profile, Task
+from app.models import Matter, Task
 
 from . import types
 
@@ -31,18 +30,10 @@ class Query:
     @strawberry.field
     async def week(
         self,
-        # info: Info,
-        promotion: int,
+        promotion: str,
         number: Optional[int] = None,
         year: Optional[int] = None,
     ) -> types.Week:
-        # allowed = await Profile.count().where(
-        #     (Profile.user_id == info.context["user"].id)
-        #     & (Profile.promotion_id == promotion)
-        # )
-        # if not allowed:
-        #     raise Exception("You are not a member of this promotion!")
-
         if number is None:
             number = date.today().isocalendar().week
         if year is None:
@@ -52,7 +43,7 @@ class Query:
         sunday = date.fromisocalendar(year, number, 7)
 
         db_tasks = await Task.select().where(
-            (Task.promotion_id == promotion)
+            (Task.promotion == promotion)
             & (Task.date >= monday)
             & (Task.date <= sunday)
         )

@@ -1,7 +1,7 @@
 from enum import Enum
 
 from piccolo.apps.user.tables import BaseUser as User
-from piccolo.columns import Boolean, Date, ForeignKey, Integer, Serial, Text, Varchar
+from piccolo.columns import Boolean, Date, ForeignKey, Serial, Text, Varchar
 from piccolo.table import Table
 
 MATTERS = [
@@ -21,24 +21,17 @@ MATTERS = [
 ]
 
 
+class Profile(Table):
+    id = Serial(primary_key=True)
+    user_id = ForeignKey(User)
+    promotion = Varchar(length=8)
+    is_public = Boolean()
+
+
 class Matter(Table):
     id = Serial(primary_key=True)
     abbr = Varchar(length=8)
     name = Varchar()
-
-
-class Promotion(Table):
-    id = Serial(primary_key=True)
-    code = Varchar(length=8)
-    start_year = Integer()
-    end_year = Integer()
-
-
-class Profile(Table):
-    id = Serial(primary_key=True)
-    user_id = ForeignKey(User)
-    promotion_id = ForeignKey(Promotion)
-    is_public = Boolean()
 
 
 class Task(Table):
@@ -49,12 +42,12 @@ class Task(Table):
         summary = "summary"
 
     id = Serial(primary_key=True)
-    promotion_id = ForeignKey(Promotion)
     date = Date()
+    promotion = Varchar(length=8)
     type = Varchar(length=16, choices=Type)
     matter_id = ForeignKey(Matter)
     title = Varchar()
     content = Text()
 
 
-TABLES = [Matter, Promotion, Profile, Task]
+TABLES = [Matter, Profile, Task]

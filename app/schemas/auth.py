@@ -12,18 +12,6 @@ from . import types
 SECRET = "secret"
 
 
-@strawberry.type
-class LoginResult:
-    user: types.User
-    token: str
-
-
-@strawberry.type
-class RegisterResult:
-    user: types.User
-    token: str
-
-
 def create_token(user_id):
     payload = {
         "sub": str(user_id),
@@ -42,17 +30,18 @@ class Query:
 @strawberry.type
 class Mutation:
     @strawberry.mutation
-    async def login(self, email: str, password: str) -> LoginResult:
+    async def login(self, email: str, password: str) -> types.AuthResult:
         user_id = await User.login(username=email, password=password)
 
         if user_id:
             user = await User.select().where(User.id == user_id).first()
-            return LoginResult(
+            return types.AuthResult(
                 user=types.User(
                     id=user["id"],
                     first_name=user["first_name"],
                     last_name=user["last_name"],
                     email=user["email"],
+                    admin=user["admin"],
                 ),
                 token=create_token(user_id),
             )
@@ -65,11 +54,9 @@ class Mutation:
         password: str,
         first_name: Optional[str] = "",
         last_name: Optional[str] = "",
-        promotion: Optional[str] = None,
-        is_public: Optional[bool] = True,
-    ) -> RegisterResult:
-        promotion_id = None
-
+        promotion: Optional[str] = "",
+        is_public: Optional[bool] = False,
+    ) -> types.AuthResult:
         try:
             user = await User.create_user(
                 username=email,
@@ -82,19 +69,20 @@ class Mutation:
             await Profile.insert(
                 Profile(
                     user_id=user["id"],
-                    promotion_id=promotion_id,
+                    promotion=promotion,
                     is_public=is_public,
                 )
             )
         except Exception:
             raise Exception("Something went wrong")
 
-        return RegisterResult(
+        return types.AuthResult(
             user=types.User(
                 id=user["id"],
                 first_name=user["first_name"],
                 last_name=user["last_name"],
                 email=user["email"],
+                admin=user["admin"],
             ),
             token=create_token(user["id"]),
         )

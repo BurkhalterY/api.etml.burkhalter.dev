@@ -7,7 +7,7 @@ from strawberry.asgi import GraphQL as _GraphQL
 
 from app.models import User
 
-from . import agenda, auth, types
+from . import agenda, auth, types, user
 
 
 class GraphQL(_GraphQL):
@@ -38,6 +38,7 @@ class GraphQL(_GraphQL):
                 first_name=user["first_name"],
                 last_name=user["last_name"],
                 email=user["email"],
+                admin=user["admin"],
             )
             if user
             else None
@@ -45,7 +46,7 @@ class GraphQL(_GraphQL):
 
 
 @strawberry.type
-class Query(agenda.Query, auth.Query):
+class Query(agenda.Query, auth.Query, user.Query):
     pass
 
 

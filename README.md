@@ -6,6 +6,7 @@ The backend of [etml.burkhalter.dev](https://github.com/BurkhalterY/etml.burkhal
 
 ```bash
 poetry install
+poetry shell
 piccolo migrations forwards user
 piccolo migrations forwards app
 ```
