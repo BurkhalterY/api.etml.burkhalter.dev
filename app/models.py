@@ -38,7 +38,7 @@ class Profile(Table):
     id = Serial(primary_key=True)
     user_id = ForeignKey(User)
     promotion_id = ForeignKey(Promotion)
-    public = Boolean()
+    is_public = Boolean()
 
 
 class Task(Table):

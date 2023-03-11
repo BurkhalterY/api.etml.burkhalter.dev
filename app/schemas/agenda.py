@@ -51,11 +51,13 @@ class Query:
         friday = date.fromisocalendar(year, number, 5)
         sunday = date.fromisocalendar(year, number, 7)
 
+        db_tasks = await Task.select().where(
+            (Task.promotion_id == promotion)
+            & (Task.date >= monday)
+            & (Task.date <= sunday)
+        )
         days = []
         for d in daterange(monday, sunday):
-            db_tasks = await Task.select().where(
-                (Task.promotion_id == promotion) & (Task.date == d)
-            )
             tasks = [
                 types.Task(
                     id=task["id"],
@@ -65,6 +67,7 @@ class Query:
                     content=task["content"],
                 )
                 for task in db_tasks
+                if task["date"] == d
             ]
             days.append(types.Day(date=d, tasks=tasks))
 

@@ -2,7 +2,6 @@ from piccolo.apps.migrations.auto.migration_manager import MigrationManager
 from piccolo.columns.column_types import Boolean
 from piccolo.columns.indexes import IndexMethod
 
-
 ID = "2023-03-05T22:00:27:037018"
 VERSION = "0.106.0"
 DESCRIPTION = ""
@@ -16,8 +15,8 @@ async def forwards():
     manager.add_column(
         table_class_name="Profile",
         tablename="profile",
-        column_name="public",
-        db_column_name="public",
+        column_name="is_public",
+        db_column_name="is_public",
         column_class_name="Boolean",
         column_class=Boolean,
         params={

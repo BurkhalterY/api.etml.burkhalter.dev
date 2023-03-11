@@ -13,31 +13,15 @@ SECRET = "secret"
 
 
 @strawberry.type
-class LoginSuccess:
+class LoginResult:
     user: types.User
     token: str
 
 
 @strawberry.type
-class LoginError:
-    message: str
-
-
-LoginResult = strawberry.union("LoginResult", (LoginSuccess, LoginError))
-
-
-@strawberry.type
-class RegisterSuccess:
+class RegisterResult:
     user: types.User
     token: str
-
-
-@strawberry.type
-class RegisterError:
-    message: str
-
-
-RegisterResult = strawberry.union("RegisterResult", (RegisterSuccess, RegisterError))
 
 
 def create_token(user_id):
@@ -63,7 +47,7 @@ class Mutation:
 
         if user_id:
             user = await User.select().where(User.id == user_id).first()
-            return LoginSuccess(
+            return LoginResult(
                 user=types.User(
                     id=user["id"],
                     first_name=user["first_name"],
@@ -72,7 +56,7 @@ class Mutation:
                 ),
                 token=create_token(user_id),
             )
-        return LoginError(message="Something went wrong")
+        raise Exception("Something went wrong")
 
     @strawberry.mutation
     async def register(
@@ -81,8 +65,8 @@ class Mutation:
         password: str,
         first_name: Optional[str] = "",
         last_name: Optional[str] = "",
-        promotion: Optional[int] = None,
-        public: Optional[bool] = True,
+        promotion: Optional[str] = None,
+        is_public: Optional[bool] = True,
     ) -> RegisterResult:
         promotion_id = None
 
@@ -99,14 +83,13 @@ class Mutation:
                 Profile(
                     user_id=user["id"],
                     promotion_id=promotion_id,
-                    public=public,
+                    is_public=is_public,
                 )
             )
-        except ValueError as e:
-            print(e)
-            return RegisterError(message="Something went wrong")
+        except Exception:
+            raise Exception("Something went wrong")
 
-        return RegisterSuccess(
+        return RegisterResult(
             user=types.User(
                 id=user["id"],
                 first_name=user["first_name"],

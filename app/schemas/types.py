@@ -19,14 +19,15 @@ class User:
             models.Profile.user_id == self.id
         )
         return [
-            Profile(id=profile["id"], public=profile["public"]) for profile in profiles
+            Profile(id=profile["id"], is_public=profile["is_public"])
+            for profile in profiles
         ]
 
 
 @strawberry.type
 class Profile:
     id: strawberry.ID
-    public: bool
+    is_public: bool
 
     @strawberry.field
     async def user(self) -> Optional["User"]:
@@ -75,10 +76,12 @@ class Promotion:
     @strawberry.field
     async def profiles(self) -> List["Profile"]:
         profiles = await models.Profile.select().where(
-            (models.Profile.promotion_id == self.id) & (models.Profile.public.eq(True))
+            (models.Profile.promotion_id == self.id)
+            & (models.Profile.is_public.eq(True))
         )
         return [
-            Profile(id=profile["id"], public=profile["public"]) for profile in profiles
+            Profile(id=profile["id"], is_public=profile["is_public"])
+            for profile in profiles
         ]
 
 
