@@ -133,3 +133,8 @@ class Mutation:
             title=title,
             content=content,
         )
+
+    @strawberry.mutation(permission_classes=[types.IsAdmin])
+    async def delete_task(self, id: int) -> bool:
+        await Task.delete().where(Task.id == id)
+        return True
