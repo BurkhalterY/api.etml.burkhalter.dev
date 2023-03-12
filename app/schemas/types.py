@@ -1,7 +1,9 @@
+import typing
 from datetime import date
 from typing import List, Optional
 
 import strawberry
+from strawberry.permission import BasePermission
 from strawberry.types import Info
 
 from app import models
@@ -67,6 +69,7 @@ class Matter:
     id: int
     abbr: str
     name: str
+    short_name: str
 
 
 @strawberry.type
@@ -90,6 +93,7 @@ class Task:
                 id=task["matter_id.id"],
                 abbr=task["matter_id.abbr"],
                 name=task["matter_id.name"],
+                short_name=task["matter_id.short_name"],
             )
             if task["matter_id.id"]
             else None
@@ -116,3 +120,19 @@ class Week:
 class Day:
     date: date
     tasks: List["Task"]
+
+
+class IsAuthenticated(BasePermission):
+    message = "User is not authenticated"
+
+    def has_permission(self, source: typing.Any, info: Info, **kwargs) -> bool:
+        user = info.context["user"]
+        return bool(user)
+
+
+class IsAdmin(BasePermission):
+    message = "User is not admin"
+
+    def has_permission(self, source: typing.Any, info: Info, **kwargs) -> bool:
+        user = info.context["user"]
+        return user.admin if user else False

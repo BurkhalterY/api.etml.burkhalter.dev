@@ -15,8 +15,9 @@ pyjwt = "^2.6.0"
 
 [tool.poetry.scripts]
 start = "app.main:start"
-grant = "app.main:grant"
-ungrant = "app.main:ungrant"
+init = "app.cli:init"
+grant = "app.cli:grant"
+ungrant = "app.cli:ungrant"
 
 [build-system]
 requires = ["poetry-core"]

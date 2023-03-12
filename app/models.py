@@ -1,24 +1,14 @@
 from enum import Enum
 
 from piccolo.apps.user.tables import BaseUser as User
-from piccolo.columns import Boolean, Date, ForeignKey, Serial, Text, Varchar
+from piccolo.columns import Boolean, Date, ForeignKey, OnDelete, Serial, Text, Varchar
 from piccolo.table import Table
 
-MATTERS = [
-    "fran",
-    "alle",
-    "angl",
-    "mathfon",
-    "scinat",
-    "chimi",
-    "phys",
-    "mathspe",
-    "hispol",
-    "ecdr",
-    "tib",
-    "tip",
-    "etml",
-]
+# After changes in this file, you have to create a migration:
+#
+# poetry shell
+# piccolo migrations new app --auto
+# piccolo migrations forwards app
 
 
 class Profile(Table):
@@ -30,8 +20,9 @@ class Profile(Table):
 
 class Matter(Table):
     id = Serial(primary_key=True)
-    abbr = Varchar(length=8)
+    abbr = Varchar(unique=True, length=8)
     name = Varchar()
+    short_name = Varchar()
 
 
 class Task(Table):
@@ -45,7 +36,7 @@ class Task(Table):
     date = Date()
     promotion = Varchar(length=8)
     type = Varchar(length=16, choices=Type)
-    matter_id = ForeignKey(Matter)
+    matter_id = ForeignKey(Matter, on_delete=OnDelete.restrict)
     title = Varchar()
     content = Text()
 

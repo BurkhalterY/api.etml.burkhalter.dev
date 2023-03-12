@@ -6,8 +6,7 @@ from starlette import requests, responses, websockets
 from strawberry.asgi import GraphQL as _GraphQL
 
 from app.models import User
-
-from . import agenda, auth, types, user
+from app.schemas import agenda, auth, types, user
 
 
 class GraphQL(_GraphQL):

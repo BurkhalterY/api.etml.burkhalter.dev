@@ -5,8 +5,7 @@ from typing import List, Optional
 import strawberry
 
 from app.models import Matter, Task
-
-from . import types
+from app.schemas import types
 
 
 def daterange(start_date, end_date, inclusive=True):
@@ -24,6 +23,7 @@ class Query:
                 id=matter["id"],
                 abbr=matter["abbr"],
                 name=matter["name"],
+                short_name=matter["short_name"],
             )
             for matter in matters
         ]
@@ -76,7 +76,7 @@ class Query:
 
 @strawberry.type
 class Mutation:
-    @strawberry.mutation
+    @strawberry.mutation(permission_classes=[types.IsAdmin])
     async def task(
         self,
         date: date,
@@ -93,11 +93,12 @@ class Mutation:
 
         allowed_types = ("homework", "test", "info", "summary")
         if type not in allowed_types:
-            raise Exception("Only types allowed are: " + ",".join(allowed_types))
+            raise Exception("Only allowed types are: " + ", ".join(allowed_types))
 
-        matter_id = (
-            await Matter.select(Matter.id).where(Matter.abbr == matter).first()
-        )["id"]
+        matter_id = await Matter.select(Matter.id).where(Matter.abbr == matter).first()
+        if matter_id is None:
+            raise Exception(f"Matter with code {matter} doesn't exist")
+        matter_id = matter_id["id"]
 
         if id:
             await Task.update(

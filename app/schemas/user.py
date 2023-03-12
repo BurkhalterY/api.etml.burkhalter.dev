@@ -1,20 +1,14 @@
 from typing import List
 
 import strawberry
-from strawberry.types import Info
 
 from app.models import Profile
-
-from . import types
+from app.schemas import types
 
 
 @strawberry.type
 class Query:
-    @strawberry.field
-    async def me(self, info: Info) -> types.User:
-        return info.context["user"]
-
-    @strawberry.field
+    @strawberry.field(permission_classes=[types.IsAuthenticated])
     async def profiles(self, promotion: str) -> List[types.Profile]:
         profiles = await Profile.select().where(
             (Profile.promotion == promotion) & (Profile.is_public.eq(True))

@@ -9,6 +9,7 @@ poetry install
 poetry shell
 piccolo migrations forwards user
 piccolo migrations forwards app
+poetry run init
 ```
 
 ## Run
@@ -17,11 +18,18 @@ piccolo migrations forwards app
 poetry run start
 ```
 
-## Dev tips
+## CLI
 
-Creating migration:
+Grant a user as admin:
 
 ```bash
-poetry shell
-piccolo migrations new app --auto
+poetry run grant me@mail.com
 ```
+
+Ungrant a user:
+
+```bash
+poetry run ungrant me@mail.com
+```
+
+Note: grant and ungrant commands can support many users at the same time.
