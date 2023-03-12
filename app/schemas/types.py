@@ -9,7 +9,7 @@ from app import models
 
 @strawberry.type
 class User:
-    id: strawberry.ID
+    id: int
     email: str
     first_name: str
     last_name: str
@@ -32,7 +32,7 @@ class User:
 
 @strawberry.type
 class Profile:
-    id: strawberry.ID
+    id: int
     promotion: str
     is_public: bool
 
@@ -64,14 +64,14 @@ class Profile:
 
 @strawberry.type
 class Matter:
-    id: strawberry.ID
+    id: int
     abbr: str
     name: str
 
 
 @strawberry.type
 class Task:
-    id: strawberry.ID
+    id: int
     date: date
     promotion: str
     type: str
@@ -104,7 +104,9 @@ class AuthResult:
 
 @strawberry.type
 class Week:
+    promotion: str
     number: int
+    year: int
     date_from: date
     date_to: date
     days: List["Day"]

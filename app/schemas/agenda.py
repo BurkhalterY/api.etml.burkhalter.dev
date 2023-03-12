@@ -1,3 +1,4 @@
+import re
 from datetime import date, timedelta
 from typing import List, Optional
 
@@ -53,6 +54,7 @@ class Query:
                 types.Task(
                     id=task["id"],
                     date=task["date"],
+                    promotion=task["promotion"],
                     type=task["type"],
                     title=task["title"],
                     content=task["content"],
@@ -62,4 +64,71 @@ class Query:
             ]
             days.append(types.Day(date=d, tasks=tasks))
 
-        return types.Week(number=number, date_from=monday, date_to=friday, days=days)
+        return types.Week(
+            promotion=promotion,
+            number=number,
+            year=year,
+            date_from=monday,
+            date_to=friday,
+            days=days,
+        )
+
+
+@strawberry.type
+class Mutation:
+    @strawberry.mutation
+    async def task(
+        self,
+        date: date,
+        promotion: str,
+        type: str,
+        matter: str,
+        title: str,
+        content: Optional[str] = "",
+        id: Optional[int] = None,
+    ) -> types.Task:
+        promotion = promotion.lower()
+        if not re.match("^[a-z0-9]{3,6}$", promotion):
+            raise Exception("Unconventional promotion name provided.")
+
+        allowed_types = ("homework", "test", "info", "summary")
+        if type not in allowed_types:
+            raise Exception("Only types allowed are: " + ",".join(allowed_types))
+
+        matter_id = (
+            await Matter.select(Matter.id).where(Matter.abbr == matter).first()
+        )["id"]
+
+        if id:
+            await Task.update(
+                {
+                    Task.date: date,
+                    Task.promotion: promotion,
+                    Task.type: type,
+                    Task.matter_id: matter_id,
+                    Task.title: title,
+                    Task.content: content,
+                }
+            ).where(Task.id == id)
+        else:
+            id = (
+                await Task.insert(
+                    Task(
+                        date=date,
+                        promotion=promotion,
+                        type=type,
+                        matter_id=matter_id,
+                        title=title,
+                        content=content,
+                    )
+                )
+            )[0]["id"]
+
+        return types.Task(
+            id=id,
+            date=date,
+            promotion=promotion,
+            type=type,
+            title=title,
+            content=content,
+        )

@@ -51,7 +51,7 @@ class Query(agenda.Query, auth.Query, user.Query):
 
 
 @strawberry.type
-class Mutation(auth.Mutation):
+class Mutation(agenda.Mutation, auth.Mutation):
     pass
 
 
