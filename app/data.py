@@ -48,7 +48,7 @@ DEFAULT_MATTERS = [
     ),
     Matter(
         abbr="ecdr",
-        name="Economie et Droit",
+        name="Économie et Droit",
         short_name="Économie",
     ),
     Matter(

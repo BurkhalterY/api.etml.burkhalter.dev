@@ -17,7 +17,7 @@ def daterange(start_date, end_date, inclusive=True):
 class Query:
     @strawberry.field
     async def matters(self) -> List[types.Matter]:
-        matters = await Matter.select()
+        matters = await Matter.select().order_by("name")
         return [
             types.Matter(
                 id=matter["id"],

@@ -4,6 +4,9 @@ The backend of [etml.burkhalter.dev](https://github.com/BurkhalterY/etml.burkhal
 
 ## Installation
 
+- Copy `database.sample.toml` to `database.toml` and configure access to database.
+- Copy `app/config/settings.sample.toml` to `app/config/settings.toml` and set environment to "dev" or "prod".
+
 ```bash
 poetry install
 poetry shell
