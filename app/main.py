@@ -5,7 +5,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.schemas import GraphQL, schema
 
-with open("app/config/settings.toml", "rb") as f:
+with open("app/config/settings.toml", "r") as f:
     config = toml.load(f)
 dev_mode = config["general"]["environment"] == "dev"
 
