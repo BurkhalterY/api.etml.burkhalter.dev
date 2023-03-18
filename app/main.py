@@ -1,4 +1,4 @@
-import tomllib
+import toml
 import uvicorn
 from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
@@ -6,7 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 from app.schemas import GraphQL, schema
 
 with open("app/config/settings.toml", "rb") as f:
-    config = tomllib.load(f)
+    config = toml.load(f)
 dev_mode = config["general"]["environment"] == "dev"
 
 graphql_app = GraphQL(schema)
