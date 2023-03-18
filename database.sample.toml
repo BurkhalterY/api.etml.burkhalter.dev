@@ -1,4 +1,10 @@
-[db]
+[general]
+engine = "sqlite|postgres"
+
+[sqlite]
+path = "etml.sqlite"
+
+[postgres]
 database = "etml_burkhalter_dev"
 user = "postgres"
 password = "toor"

@@ -152,6 +152,7 @@ cython_debug/
 #.idea/
 
 # etml.burkhalter.dev
+etml.sqlite
 database.toml
 app/config/*.toml
 !app/config/*.sample.toml
