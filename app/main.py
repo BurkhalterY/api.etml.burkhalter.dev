@@ -1,3 +1,5 @@
+import os.path
+
 import toml
 import uvicorn
 from starlette.applications import Starlette
@@ -5,9 +7,12 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.schemas import GraphQL, schema
 
-with open("app/config/settings.toml", "r") as f:
-    config = toml.load(f)
-dev_mode = config["general"]["environment"] == "dev"
+settings_file = "app/config/settings.toml"
+config = {}
+if os.path.isfile(settings_file):
+    with open(settings_file, "r") as f:
+        config = toml.load(f).get("general", {})
+dev_mode = config.get("environment", "dev") != "prod"
 
 graphql_app = GraphQL(schema)
 app = Starlette()
@@ -23,4 +28,9 @@ app.add_middleware(
 
 
 def start():
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=dev_mode)
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=config.get("port", 8000),
+        reload=dev_mode,
+    )
