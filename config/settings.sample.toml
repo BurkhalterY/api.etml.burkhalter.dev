@@ -1,4 +1,6 @@
 [general]
+environment = "dev|prod"
+port = 8000
 engine = "sqlite|postgres"
 
 [sqlite]

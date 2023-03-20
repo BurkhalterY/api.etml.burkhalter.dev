@@ -122,6 +122,23 @@ class Day:
     tasks: List["Task"]
 
 
+@strawberry.type
+class Grade:
+    id: Optional[int]
+    value: float
+    parent_grade: Optional["Grade"]
+    subgrades: List["Grade"]
+
+
+@strawberry.type
+class Gradebook:
+    semester_average: float
+    sub_4_matters: int
+    negative_points: float
+    success: bool
+    averages: List["Grade"]
+
+
 class IsAuthenticated(BasePermission):
     message = "User is not authenticated"
 

@@ -3,7 +3,7 @@ from piccolo.conf.apps import AppRegistry
 from piccolo.engine.postgres import PostgresEngine
 from piccolo.engine.sqlite import SQLiteEngine
 
-with open("database.toml", "r") as f:
+with open("config/settings.toml", "r") as f:
     config = toml.load(f)
 
 APP_REGISTRY = AppRegistry(apps=["app.piccolo_app", "piccolo.apps.user.piccolo_app"])

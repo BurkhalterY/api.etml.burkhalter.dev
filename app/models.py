@@ -41,4 +41,11 @@ class Task(Table):
     content = Text()
 
 
+class Grade(Table):
+    id = Serial(primary_key=True)
+    value = float
+    profile_id = ForeignKey(Profile)
+    parent_id = ForeignKey("self")
+
+
 TABLES = [Matter, Profile, Task]

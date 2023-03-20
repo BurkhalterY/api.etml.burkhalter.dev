@@ -7,7 +7,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.schemas import GraphQL, schema
 
-settings_file = "app/config/settings.toml"
+settings_file = "config/settings.toml"
 config = {}
 if os.path.isfile(settings_file):
     with open(settings_file, "r") as f:
@@ -27,8 +27,8 @@ app.add_middleware(
 )
 
 
-ssl_keyfile = "app/config/key.pem"
-ssl_certfile = "app/config/cert.pem"
+ssl_keyfile = "config/key.pem"
+ssl_certfile = "config/cert.pem"
 if not (os.path.isfile(ssl_keyfile) and os.path.isfile(ssl_certfile)):
     ssl_keyfile = None
     ssl_certfile = None
