@@ -27,10 +27,19 @@ app.add_middleware(
 )
 
 
+ssl_keyfile = "app/config/key.pem"
+ssl_certfile = "app/config/cert.pem"
+if not (os.path.isfile(ssl_keyfile) and os.path.isfile(ssl_certfile)):
+    ssl_keyfile = (None,)
+    ssl_certfile = None
+
+
 def start():
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
         port=config.get("port", 8000),
         reload=dev_mode,
+        ssl_keyfile=ssl_keyfile,
+        ssl_certfile=ssl_certfile,
     )
