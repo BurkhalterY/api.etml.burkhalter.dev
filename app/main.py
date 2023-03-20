@@ -30,7 +30,7 @@ app.add_middleware(
 ssl_keyfile = "app/config/key.pem"
 ssl_certfile = "app/config/cert.pem"
 if not (os.path.isfile(ssl_keyfile) and os.path.isfile(ssl_certfile)):
-    ssl_keyfile = (None,)
+    ssl_keyfile = None
     ssl_certfile = None
 
 
