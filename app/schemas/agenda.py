@@ -82,7 +82,7 @@ class Mutation:
         date: date,
         promotion: str,
         type: str,
-        matter: str,
+        matter_id: int,
         title: str,
         content: Optional[str] = "",
         id: Optional[int] = None,
@@ -94,11 +94,6 @@ class Mutation:
         allowed_types = ("homework", "test", "info", "summary")
         if type not in allowed_types:
             raise Exception("Only allowed types are: " + ", ".join(allowed_types))
-
-        matter_id = await Matter.select(Matter.id).where(Matter.abbr == matter).first()
-        if matter_id is None:
-            raise Exception(f"Matter with code {matter} doesn't exist")
-        matter_id = matter_id["id"]
 
         if id:
             await Task.update(

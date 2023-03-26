@@ -1,7 +1,17 @@
 from enum import Enum
 
 from piccolo.apps.user.tables import BaseUser as User
-from piccolo.columns import Boolean, Date, ForeignKey, OnDelete, Serial, Text, Varchar
+from piccolo.columns import (
+    Boolean,
+    Date,
+    Float,
+    ForeignKey,
+    Integer,
+    OnDelete,
+    Serial,
+    Text,
+    Varchar,
+)
 from piccolo.table import Table
 
 # After changes in this file, you have to create a migration:
@@ -13,7 +23,7 @@ from piccolo.table import Table
 
 class Profile(Table):
     id = Serial(primary_key=True)
-    user_id = ForeignKey(User)
+    user_id = ForeignKey(User, on_delete=OnDelete.set_null)
     promotion = Varchar(length=8)
     is_public = Boolean()
 
@@ -23,6 +33,24 @@ class Matter(Table):
     abbr = Varchar(unique=True, length=8)
     name = Varchar()
     short_name = Varchar()
+    parent_id = ForeignKey("self", on_delete=OnDelete.restrict)
+
+
+class Test(Table):
+    id = Serial(primary_key=True)
+    promotion = Varchar(length=8)
+    semester = Integer()
+    matter_id = ForeignKey(Matter, on_delete=OnDelete.restrict)
+    title = Varchar()
+    content = Text()
+
+
+class Grade(Table):
+    id = Serial(primary_key=True)
+    profile_id = ForeignKey(Profile, on_delete=OnDelete.set_null)
+    test_id = ForeignKey(Test, on_delete=OnDelete.set_null)
+    value = Float()
+    date = Date()
 
 
 class Task(Table):
@@ -39,13 +67,7 @@ class Task(Table):
     matter_id = ForeignKey(Matter, on_delete=OnDelete.restrict)
     title = Varchar()
     content = Text()
+    test_id = ForeignKey(Test, on_delete=OnDelete.set_null)
 
 
-class Grade(Table):
-    id = Serial(primary_key=True)
-    value = float
-    profile_id = ForeignKey(Profile)
-    parent_id = ForeignKey("self")
-
-
-TABLES = [Matter, Profile, Task]
+TABLES = [Grade, Matter, Profile, Task, Test]

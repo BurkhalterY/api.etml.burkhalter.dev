@@ -6,7 +6,7 @@ from starlette import requests, responses, websockets
 from strawberry.asgi import GraphQL as _GraphQL
 
 from app.models import User
-from app.schemas import agenda, auth, types, user
+from app.schemas import agenda, auth, gradebook, types, user
 
 
 class GraphQL(_GraphQL):
@@ -45,12 +45,12 @@ class GraphQL(_GraphQL):
 
 
 @strawberry.type
-class Query(agenda.Query, auth.Query, user.Query):
+class Query(agenda.Query, auth.Query, gradebook.Query, user.Query):
     pass
 
 
 @strawberry.type
-class Mutation(agenda.Mutation, auth.Mutation):
+class Mutation(agenda.Mutation, auth.Mutation, gradebook.Query):
     pass
 
 
