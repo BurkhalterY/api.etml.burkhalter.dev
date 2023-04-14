@@ -4,8 +4,8 @@ from typing import List, Optional
 
 import strawberry
 
-from app.models import Matter, Task
-from app.schemas import types
+from app import models
+from app.schemas.auth import IsAdmin
 
 
 def daterange(start_date, end_date, inclusive=True):
@@ -14,12 +14,64 @@ def daterange(start_date, end_date, inclusive=True):
 
 
 @strawberry.type
+class Matter:
+    id: int
+    abbr: str
+    name: str
+    short_name: str
+
+
+@strawberry.type
+class Task:
+    id: int
+    date: date
+    promotion: str
+    type: str
+    title: str
+    content: str
+
+    @strawberry.field
+    async def matter(self) -> Optional[Matter]:
+        task = (
+            await models.Task.select(models.Task.matter_id.all_columns())
+            .where(models.Task.id == self.id)
+            .first()
+        )
+        return (
+            Matter(
+                id=task["matter_id.id"],
+                abbr=task["matter_id.abbr"],
+                name=task["matter_id.name"],
+                short_name=task["matter_id.short_name"],
+            )
+            if task["matter_id.id"]
+            else None
+        )
+
+
+@strawberry.type
+class Day:
+    date: date
+    tasks: List[Task]
+
+
+@strawberry.type
+class Week:
+    promotion: str
+    number: int
+    year: int
+    date_from: date
+    date_to: date
+    days: List[Day]
+
+
+@strawberry.type
 class Query:
     @strawberry.field
-    async def matters(self) -> List[types.Matter]:
-        matters = await Matter.select().order_by("name")
+    async def matters(self) -> List[Matter]:
+        matters = await models.Matter.select().order_by("name")
         return [
-            types.Matter(
+            Matter(
                 id=matter["id"],
                 abbr=matter["abbr"],
                 name=matter["name"],
@@ -34,7 +86,7 @@ class Query:
         promotion: str,
         number: Optional[int] = None,
         year: Optional[int] = None,
-    ) -> types.Week:
+    ) -> Week:
         if number is None:
             number = date.today().isocalendar().week
         if year is None:
@@ -43,15 +95,15 @@ class Query:
         friday = date.fromisocalendar(year, number, 5)
         sunday = date.fromisocalendar(year, number, 7)
 
-        db_tasks = await Task.select().where(
-            (Task.promotion == promotion)
-            & (Task.date >= monday)
-            & (Task.date <= sunday)
+        db_tasks = await models.Task.select().where(
+            (models.Task.promotion == promotion)
+            & (models.Task.date >= monday)
+            & (models.Task.date <= sunday)
         )
         days = []
         for d in daterange(monday, sunday):
             tasks = [
-                types.Task(
+                Task(
                     id=task["id"],
                     date=task["date"],
                     promotion=task["promotion"],
@@ -62,9 +114,9 @@ class Query:
                 for task in db_tasks
                 if task["date"] == d
             ]
-            days.append(types.Day(date=d, tasks=tasks))
+            days.append(Day(date=d, tasks=tasks))
 
-        return types.Week(
+        return Week(
             promotion=promotion,
             number=number,
             year=year,
@@ -76,7 +128,7 @@ class Query:
 
 @strawberry.type
 class Mutation:
-    @strawberry.mutation(permission_classes=[types.IsAdmin])
+    @strawberry.mutation(permission_classes=[IsAdmin])
     async def task(
         self,
         date: date,
@@ -86,7 +138,7 @@ class Mutation:
         title: str,
         content: Optional[str] = "",
         id: Optional[int] = None,
-    ) -> types.Task:
+    ) -> Task:
         promotion = promotion.lower()
         if not re.match("^[a-z0-9]{3,6}$", promotion):
             raise Exception("Unconventional promotion name provided.")
@@ -96,20 +148,20 @@ class Mutation:
             raise Exception("Only allowed types are: " + ", ".join(allowed_types))
 
         if id:
-            await Task.update(
+            await models.Task.update(
                 {
-                    Task.date: date,
-                    Task.promotion: promotion,
-                    Task.type: type,
-                    Task.matter_id: matter_id,
-                    Task.title: title,
-                    Task.content: content,
+                    models.Task.date: date,
+                    models.Task.promotion: promotion,
+                    models.Task.type: type,
+                    models.Task.matter_id: matter_id,
+                    models.Task.title: title,
+                    models.Task.content: content,
                 }
-            ).where(Task.id == id)
+            ).where(models.Task.id == id)
         else:
             id = (
-                await Task.insert(
-                    Task(
+                await models.Task.insert(
+                    models.Task(
                         date=date,
                         promotion=promotion,
                         type=type,
@@ -120,7 +172,7 @@ class Mutation:
                 )
             )[0]["id"]
 
-        return types.Task(
+        return Task(
             id=id,
             date=date,
             promotion=promotion,
@@ -129,7 +181,7 @@ class Mutation:
             content=content,
         )
 
-    @strawberry.mutation(permission_classes=[types.IsAdmin])
+    @strawberry.mutation(permission_classes=[IsAdmin])
     async def delete_task(self, id: int) -> bool:
-        await Task.delete().where(Task.id == id)
+        await models.Task.delete().where(models.Task.id == id)
         return True

@@ -21,11 +21,10 @@ from piccolo.table import Table
 # piccolo migrations forwards app
 
 
-class Profile(Table):
+class Formation(Table):
     id = Serial(primary_key=True)
-    user_id = ForeignKey(User, on_delete=OnDelete.set_null)
-    promotion = Varchar(length=8)
-    is_public = Boolean()
+    name = Varchar()
+    duration = Integer()
 
 
 class Matter(Table):
@@ -36,10 +35,45 @@ class Matter(Table):
     parent_id = ForeignKey("self", on_delete=OnDelete.restrict)
 
 
+class School(Table):
+    id = Serial(primary_key=True)
+    abbr = Varchar(length=32)
+    full_name = Varchar()
+    street = Varchar()
+    city = Varchar()
+    plz = Varchar()
+    phone = Varchar(length=24)
+    email = Varchar()
+    website = Varchar()
+
+
+class Promotion(Table):
+    id = Serial(primary_key=True)
+    formation_id = ForeignKey(Formation, on_delete=OnDelete.restrict)
+    code = Varchar(length=8)
+    school_id = ForeignKey(School, on_delete=OnDelete.restrict)
+    year_start = Integer()
+    year_end = Integer()
+
+
+class Profile(Table):
+    id = Serial(primary_key=True)
+    user_id = ForeignKey(User, on_delete=OnDelete.restrict)
+    promotion_id = ForeignKey(Promotion, on_delete=OnDelete.restrict)
+    year_start = Integer()
+    year_end = Integer()
+    is_public = Boolean()
+
+
+class Semester(Table):
+    id = Serial(primary_key=True)
+    profile_id = ForeignKey(Profile)
+    number = Integer()
+
+
 class Test(Table):
     id = Serial(primary_key=True)
-    promotion = Varchar(length=8)
-    semester = Integer()
+    promotion_id = ForeignKey(Promotion, on_delete=OnDelete.restrict)
     matter_id = ForeignKey(Matter, on_delete=OnDelete.restrict)
     title = Varchar()
     content = Text()
@@ -47,8 +81,8 @@ class Test(Table):
 
 class Grade(Table):
     id = Serial(primary_key=True)
-    profile_id = ForeignKey(Profile, on_delete=OnDelete.set_null)
-    test_id = ForeignKey(Test, on_delete=OnDelete.set_null)
+    semester_id = ForeignKey(Semester)
+    test_id = ForeignKey(Test, on_delete=OnDelete.restrict)
     value = Float()
     date = Date()
 
@@ -62,12 +96,12 @@ class Task(Table):
 
     id = Serial(primary_key=True)
     date = Date()
-    promotion = Varchar(length=8)
+    promotion_id = ForeignKey(Promotion, on_delete=OnDelete.restrict)
     type = Varchar(length=16, choices=Type)
     matter_id = ForeignKey(Matter, on_delete=OnDelete.restrict)
     title = Varchar()
     content = Text()
-    test_id = ForeignKey(Test, on_delete=OnDelete.set_null)
+    test_id = ForeignKey(Test, on_delete=OnDelete.restrict)
 
 
-TABLES = [Grade, Matter, Profile, Task, Test]
+TABLES = [Formation, Matter, Promotion, Profile, Semester, Test, Grade, Task]

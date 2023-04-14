@@ -5,8 +5,8 @@ import strawberry
 from starlette import requests, responses, websockets
 from strawberry.asgi import GraphQL as _GraphQL
 
-from app.models import User
-from app.schemas import agenda, auth, gradebook, types, user
+from app import models
+from app.schemas import agenda, auth
 
 
 class GraphQL(_GraphQL):
@@ -21,7 +21,7 @@ class GraphQL(_GraphQL):
         self,
         request: Union[requests.Request, websockets.WebSocket],
         response: Optional[responses.Response] = None,
-    ) -> Optional[types.User]:
+    ) -> Optional[auth.User]:
         if not request:
             return None
 
@@ -30,9 +30,13 @@ class GraphQL(_GraphQL):
             return None
 
         payload = jwt.decode(authorization, auth.SECRET, ["HS256"])
-        user = await User.select().where(User.id == int(payload["sub"])).first()
+        user = (
+            await models.User.select()
+            .where(models.User.id == int(payload["sub"]))
+            .first()
+        )
         return (
-            types.User(
+            auth.User(
                 id=user["id"],
                 first_name=user["first_name"],
                 last_name=user["last_name"],
@@ -45,12 +49,12 @@ class GraphQL(_GraphQL):
 
 
 @strawberry.type
-class Query(agenda.Query, auth.Query, gradebook.Query, user.Query):
+class Query(agenda.Query, auth.Query):
     pass
 
 
 @strawberry.type
-class Mutation(agenda.Mutation, auth.Mutation, gradebook.Query):
+class Mutation(agenda.Mutation, auth.Mutation):
     pass
 
 
