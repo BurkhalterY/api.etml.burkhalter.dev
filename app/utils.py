@@ -1,8 +1,11 @@
 from dataclasses import fields
 
+import strawberry
+
 
 class BaseStrawberryType:
-    _model = ""
+    _model = strawberry.Private[object]
+    _record = strawberry.Private[object]
 
     def __init__(self, rec=None, id=None):
         if id:

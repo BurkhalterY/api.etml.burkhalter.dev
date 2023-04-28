@@ -23,6 +23,8 @@ class Matter:
 
 @strawberry.type
 class Task:
+    _model = models.Task
+
     id: int
     date: date
     promotion: str
@@ -68,6 +70,11 @@ class Week:
 @strawberry.type
 class Query:
     @strawberry.field
+    async def test(self) -> List[Task]:
+        tasks = await models.Matter.select().order_by("name")
+        return [Task(task) for task in tasks]
+
+    @strawberry.field
     async def matters(self) -> List[Matter]:
         matters = await models.Matter.select().order_by("name")
         return [
@@ -96,7 +103,7 @@ class Query:
         sunday = date.fromisocalendar(year, number, 7)
 
         db_tasks = await models.Task.select().where(
-            (models.Task.promotion == promotion)
+            (models.Task.promotion_id.code == promotion)
             & (models.Task.date >= monday)
             & (models.Task.date <= sunday)
         )
@@ -106,7 +113,7 @@ class Query:
                 Task(
                     id=task["id"],
                     date=task["date"],
-                    promotion=task["promotion"],
+                    promotion=promotion,
                     type=task["type"],
                     title=task["title"],
                     content=task["content"],
