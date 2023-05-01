@@ -35,17 +35,7 @@ class GraphQL(_GraphQL):
             .where(models.User.id == int(payload["sub"]))
             .first()
         )
-        return (
-            auth.User(
-                id=user["id"],
-                first_name=user["first_name"],
-                last_name=user["last_name"],
-                email=user["email"],
-                admin=user["admin"],
-            )
-            if user
-            else None
-        )
+        return auth.User(**user) if user else None
 
 
 @strawberry.type

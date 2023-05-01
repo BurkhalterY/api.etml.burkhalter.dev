@@ -1,14 +1,13 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 
 import strawberry
 
 from app import models
 from app.schemas.auth import IsAdmin
-from app.utils import BaseStrawberryType
 
 
 @strawberry.type
-class School(BaseStrawberryType):
+class School:
     id: int
     abbr: str
     full_name: str
@@ -21,18 +20,22 @@ class School(BaseStrawberryType):
 
 
 @strawberry.type
-class Formation(BaseStrawberryType):
+class Formation:
     id: int
     name: str
     duration: int
 
 
 @strawberry.type
-class Promotion(BaseStrawberryType):
+class Promotion:
+    _model: strawberry.Private[Any] = models.Promotion
+
     id: int
+    formation_id: int
     code: str
+    school_id: int
     year_start: int
-    end_start: int
+    year_end: int
 
     @strawberry.field
     async def formation(self) -> Optional[Formation]:

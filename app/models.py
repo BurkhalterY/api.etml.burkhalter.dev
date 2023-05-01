@@ -104,4 +104,14 @@ class Task(Table):
     test_id = ForeignKey(Test, on_delete=OnDelete.restrict)
 
 
-TABLES = [Formation, Matter, Promotion, Profile, Semester, Test, Grade, Task]
+TABLES = [
+    Formation,
+    Grade,
+    Matter,
+    Profile,
+    Promotion,
+    School,
+    Semester,
+    Task,
+    Test,
+]

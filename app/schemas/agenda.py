@@ -1,11 +1,12 @@
 import re
 from datetime import date, timedelta
-from typing import List, Optional
+from typing import Any, List, Optional
 
 import strawberry
 
 from app import models
 from app.schemas.auth import IsAdmin
+from app.schemas.school import Promotion
 
 
 def daterange(start_date, end_date, inclusive=True):
@@ -15,40 +16,54 @@ def daterange(start_date, end_date, inclusive=True):
 
 @strawberry.type
 class Matter:
+    _model: strawberry.Private[Any] = models.Matter
+
     id: int
     abbr: str
     name: str
     short_name: str
+    parent_id: int
 
 
 @strawberry.type
 class Task:
-    _model = models.Task
+    _model: strawberry.Private[Any] = models.Task
 
     id: int
     date: date
-    promotion: str
+    promotion_id: int
     type: str
+    matter_id: int
     title: str
     content: str
+    test_id: int
 
     @strawberry.field
     async def matter(self) -> Optional[Matter]:
-        task = (
-            await models.Task.select(models.Task.matter_id.all_columns())
-            .where(models.Task.id == self.id)
+        matter = (
+            await Matter._model.select()
+            .where(Matter._model.id == self.matter_id)
             .first()
         )
-        return (
-            Matter(
-                id=task["matter_id.id"],
-                abbr=task["matter_id.abbr"],
-                name=task["matter_id.name"],
-                short_name=task["matter_id.short_name"],
-            )
-            if task["matter_id.id"]
-            else None
+        return Matter(**matter) if matter else None
+
+    @strawberry.field
+    async def promotion(self) -> Optional[Promotion]:
+        promotion = (
+            await Promotion._model.select()
+            .where(Promotion._model.id == self.promotion_id)
+            .first()
         )
+        return Promotion(**promotion) if promotion else None
+
+    # @strawberry.field
+    # async def test(self) -> Optional[Test]:
+    #     test = (
+    #         await Test._model.select()
+    #         .where(Test._model.id == self.test_id)
+    #         .first()
+    #     )
+    #     return Test(**test) if test else None
 
 
 @strawberry.type
@@ -59,33 +74,29 @@ class Day:
 
 @strawberry.type
 class Week:
-    promotion: str
+    promotion_id: int
     number: int
     year: int
     date_from: date
     date_to: date
     days: List[Day]
 
+    @strawberry.field
+    async def promotion(self) -> Optional[Promotion]:
+        promotion = (
+            await Promotion._model.select()
+            .where(Promotion._model.id == self.promotion_id)
+            .first()
+        )
+        return Promotion(**promotion) if promotion else None
+
 
 @strawberry.type
 class Query:
     @strawberry.field
-    async def test(self) -> List[Task]:
-        tasks = await models.Matter.select().order_by("name")
-        return [Task(task) for task in tasks]
-
-    @strawberry.field
     async def matters(self) -> List[Matter]:
-        matters = await models.Matter.select().order_by("name")
-        return [
-            Matter(
-                id=matter["id"],
-                abbr=matter["abbr"],
-                name=matter["name"],
-                short_name=matter["short_name"],
-            )
-            for matter in matters
-        ]
+        matters = await Matter._model.select().order_by("name")
+        return [Matter(**matter) for matter in matters]
 
     @strawberry.field
     async def week(
@@ -109,18 +120,7 @@ class Query:
         )
         days = []
         for d in daterange(monday, sunday):
-            tasks = [
-                Task(
-                    id=task["id"],
-                    date=task["date"],
-                    promotion=promotion,
-                    type=task["type"],
-                    title=task["title"],
-                    content=task["content"],
-                )
-                for task in db_tasks
-                if task["date"] == d
-            ]
+            tasks = [Task(**task) for task in db_tasks if task["date"] == d]
             days.append(Day(date=d, tasks=tasks))
 
         return Week(

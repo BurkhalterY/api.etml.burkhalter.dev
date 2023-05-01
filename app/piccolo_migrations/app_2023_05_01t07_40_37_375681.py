@@ -1,13 +1,14 @@
 from piccolo.apps.migrations.auto.migration_manager import MigrationManager
-from piccolo.columns.base import OnDelete
-from piccolo.columns.base import OnUpdate
-from piccolo.columns.column_types import Date
-from piccolo.columns.column_types import Float
-from piccolo.columns.column_types import ForeignKey
-from piccolo.columns.column_types import Integer
-from piccolo.columns.column_types import Serial
-from piccolo.columns.column_types import Text
-from piccolo.columns.column_types import Varchar
+from piccolo.columns.base import OnDelete, OnUpdate
+from piccolo.columns.column_types import (
+    Date,
+    Float,
+    ForeignKey,
+    Integer,
+    Serial,
+    Text,
+    Varchar,
+)
 from piccolo.columns.defaults.date import DateNow
 from piccolo.columns.indexes import IndexMethod
 from piccolo.table import Table
@@ -104,29 +105,42 @@ class Test(Table, tablename="test"):
     )
 
 
-ID = "2023-04-04T20:27:20:932451"
+class Task(Table, tablename="task"):
+    id = Serial(
+        null=False,
+        primary_key=True,
+        unique=False,
+        index=False,
+        index_method=IndexMethod.btree,
+        choices=None,
+        db_column_name=None,
+        secret=False,
+    )
+
+
+ID = "2023-05-01T07:40:37:375681"
 VERSION = "0.109.0"
 DESCRIPTION = ""
 
 
 async def forwards():
-    manager = MigrationManager(
-        migration_id=ID, app_name="app", description=DESCRIPTION
-    )
-
-    manager.add_table("Grade", tablename="grade")
-
-    manager.add_table("Test", tablename="test")
+    manager = MigrationManager(migration_id=ID, app_name="app", description=DESCRIPTION)
 
     manager.add_table("Semester", tablename="semester")
+
+    manager.add_table("School", tablename="school")
+
+    manager.add_table("Test", tablename="test")
 
     manager.add_table("Promotion", tablename="promotion")
 
     manager.add_table("Formation", tablename="formation")
 
+    manager.add_table("Grade", tablename="grade")
+
     manager.add_column(
-        table_class_name="Grade",
-        tablename="grade",
+        table_class_name="Semester",
+        tablename="semester",
         column_name="id",
         db_column_name="id",
         column_class_name="Serial",
@@ -144,14 +158,14 @@ async def forwards():
     )
 
     manager.add_column(
-        table_class_name="Grade",
-        tablename="grade",
-        column_name="semester_id",
-        db_column_name="semester_id",
+        table_class_name="Semester",
+        tablename="semester",
+        column_name="profile_id",
+        db_column_name="profile_id",
         column_class_name="ForeignKey",
         column_class=ForeignKey,
         params={
-            "references": Semester,
+            "references": Profile,
             "on_delete": OnDelete.cascade,
             "on_update": OnUpdate.cascade,
             "target_column": None,
@@ -167,37 +181,14 @@ async def forwards():
     )
 
     manager.add_column(
-        table_class_name="Grade",
-        tablename="grade",
-        column_name="test_id",
-        db_column_name="test_id",
-        column_class_name="ForeignKey",
-        column_class=ForeignKey,
+        table_class_name="Semester",
+        tablename="semester",
+        column_name="number",
+        db_column_name="number",
+        column_class_name="Integer",
+        column_class=Integer,
         params={
-            "references": Test,
-            "on_delete": OnDelete.restrict,
-            "on_update": OnUpdate.cascade,
-            "target_column": None,
-            "null": True,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-    )
-
-    manager.add_column(
-        table_class_name="Grade",
-        tablename="grade",
-        column_name="value",
-        db_column_name="value",
-        column_class_name="Float",
-        column_class=Float,
-        params={
-            "default": 0.0,
+            "default": 0,
             "null": False,
             "primary_key": False,
             "unique": False,
@@ -210,14 +201,181 @@ async def forwards():
     )
 
     manager.add_column(
-        table_class_name="Grade",
-        tablename="grade",
-        column_name="date",
-        db_column_name="date",
-        column_class_name="Date",
-        column_class=Date,
+        table_class_name="School",
+        tablename="school",
+        column_name="id",
+        db_column_name="id",
+        column_class_name="Serial",
+        column_class=Serial,
         params={
-            "default": DateNow(),
+            "null": False,
+            "primary_key": True,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
+    manager.add_column(
+        table_class_name="School",
+        tablename="school",
+        column_name="abbr",
+        db_column_name="abbr",
+        column_class_name="Varchar",
+        column_class=Varchar,
+        params={
+            "length": 32,
+            "default": "",
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
+    manager.add_column(
+        table_class_name="School",
+        tablename="school",
+        column_name="full_name",
+        db_column_name="full_name",
+        column_class_name="Varchar",
+        column_class=Varchar,
+        params={
+            "length": 255,
+            "default": "",
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
+    manager.add_column(
+        table_class_name="School",
+        tablename="school",
+        column_name="street",
+        db_column_name="street",
+        column_class_name="Varchar",
+        column_class=Varchar,
+        params={
+            "length": 255,
+            "default": "",
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
+    manager.add_column(
+        table_class_name="School",
+        tablename="school",
+        column_name="city",
+        db_column_name="city",
+        column_class_name="Varchar",
+        column_class=Varchar,
+        params={
+            "length": 255,
+            "default": "",
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
+    manager.add_column(
+        table_class_name="School",
+        tablename="school",
+        column_name="plz",
+        db_column_name="plz",
+        column_class_name="Varchar",
+        column_class=Varchar,
+        params={
+            "length": 255,
+            "default": "",
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
+    manager.add_column(
+        table_class_name="School",
+        tablename="school",
+        column_name="phone",
+        db_column_name="phone",
+        column_class_name="Varchar",
+        column_class=Varchar,
+        params={
+            "length": 24,
+            "default": "",
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
+    manager.add_column(
+        table_class_name="School",
+        tablename="school",
+        column_name="email",
+        db_column_name="email",
+        column_class_name="Varchar",
+        column_class=Varchar,
+        params={
+            "length": 255,
+            "default": "",
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
+    manager.add_column(
+        table_class_name="School",
+        tablename="school",
+        column_name="website",
+        db_column_name="website",
+        column_class_name="Varchar",
+        column_class=Varchar,
+        params={
+            "length": 255,
+            "default": "",
             "null": False,
             "primary_key": False,
             "unique": False,
@@ -324,68 +482,6 @@ async def forwards():
         column_class=Text,
         params={
             "default": "",
-            "null": False,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-    )
-
-    manager.add_column(
-        table_class_name="Semester",
-        tablename="semester",
-        column_name="id",
-        db_column_name="id",
-        column_class_name="Serial",
-        column_class=Serial,
-        params={
-            "null": False,
-            "primary_key": True,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-    )
-
-    manager.add_column(
-        table_class_name="Semester",
-        tablename="semester",
-        column_name="profile_id",
-        db_column_name="profile_id",
-        column_class_name="ForeignKey",
-        column_class=ForeignKey,
-        params={
-            "references": Profile,
-            "on_delete": OnDelete.cascade,
-            "on_update": OnUpdate.cascade,
-            "target_column": None,
-            "null": True,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-    )
-
-    manager.add_column(
-        table_class_name="Semester",
-        tablename="semester",
-        column_name="number",
-        db_column_name="number",
-        column_class_name="Integer",
-        column_class=Integer,
-        params={
-            "default": 0,
             "null": False,
             "primary_key": False,
             "unique": False,
@@ -583,6 +679,111 @@ async def forwards():
         },
     )
 
+    manager.add_column(
+        table_class_name="Grade",
+        tablename="grade",
+        column_name="id",
+        db_column_name="id",
+        column_class_name="Serial",
+        column_class=Serial,
+        params={
+            "null": False,
+            "primary_key": True,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
+    manager.add_column(
+        table_class_name="Grade",
+        tablename="grade",
+        column_name="semester_id",
+        db_column_name="semester_id",
+        column_class_name="ForeignKey",
+        column_class=ForeignKey,
+        params={
+            "references": Semester,
+            "on_delete": OnDelete.cascade,
+            "on_update": OnUpdate.cascade,
+            "target_column": None,
+            "null": True,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
+    manager.add_column(
+        table_class_name="Grade",
+        tablename="grade",
+        column_name="test_id",
+        db_column_name="test_id",
+        column_class_name="ForeignKey",
+        column_class=ForeignKey,
+        params={
+            "references": Test,
+            "on_delete": OnDelete.restrict,
+            "on_update": OnUpdate.cascade,
+            "target_column": None,
+            "null": True,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
+    manager.add_column(
+        table_class_name="Grade",
+        tablename="grade",
+        column_name="value",
+        db_column_name="value",
+        column_class_name="Float",
+        column_class=Float,
+        params={
+            "default": 0.0,
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
+    manager.add_column(
+        table_class_name="Grade",
+        tablename="grade",
+        column_name="date",
+        db_column_name="date",
+        column_class_name="Date",
+        column_class=Date,
+        params={
+            "default": DateNow(),
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+    )
+
     manager.drop_column(
         table_class_name="Profile",
         tablename="profile",
@@ -740,4 +941,17 @@ async def forwards():
         old_column_class=ForeignKey,
     )
 
+    async def run():
+        promotion = await Promotion.insert(
+            Promotion(
+                formation_id=None,
+                code="mtu1e",
+                school_id=None,
+                year_start=2022,
+                year_end=2023,
+            )
+        )
+        await Task.update({Task.promotion_id: promotion[0]["id"]}, force=True)
+
+    manager.add_raw(run)
     return manager
