@@ -1,15 +1,21 @@
-import toml
+import os
+
 from piccolo.conf.apps import AppRegistry
 from piccolo.engine.postgres import PostgresEngine
-from piccolo.engine.sqlite import SQLiteEngine
 
-with open("config/settings.toml", "r") as f:
-    config = toml.load(f)
+DATABASE = os.environ.get("POSTGRES_DB")
+USER = os.environ.get("POSTGRES_USER")
+PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+HOST = os.environ.get("POSTGRES_HOST", "localhost")
+PORT = int(os.environ.get("POSTGRES_PORT", 5432))
 
 APP_REGISTRY = AppRegistry(apps=["app.piccolo_app", "piccolo.apps.user.piccolo_app"])
-
-engine = config["general"]["engine"]
-if engine == "sqlite":
-    DB = SQLiteEngine(path=config["sqlite"]["path"])
-if engine == "postgres":
-    DB = PostgresEngine(config=config["postgres"])
+DB = PostgresEngine(
+    {
+        "host": HOST,
+        "port": PORT,
+        "database": DATABASE,
+        "user": USER,
+        "password": PASSWORD,
+    }
+)

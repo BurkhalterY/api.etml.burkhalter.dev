@@ -7,46 +7,6 @@ from app.schemas.auth import IsAdmin
 
 
 @strawberry.type
-class School:
-    id: int
-    abbr: str
-    full_name: str
-    street: str
-    city: str
-    plz: str
-    phone: str
-    email: str
-    website: str
-
-
-@strawberry.type
-class Formation:
-    id: int
-    name: str
-    duration: int
-
-
-@strawberry.type
-class Promotion:
-    _model: strawberry.Private[Any] = models.Promotion
-
-    id: int
-    formation_id: int
-    code: str
-    school_id: int
-    year_start: int
-    year_end: int
-
-    @strawberry.field
-    async def formation(self) -> Optional[Formation]:
-        pass
-
-    @strawberry.field
-    async def school(self) -> Optional[School]:
-        pass
-
-
-@strawberry.type
 class Query:
     @strawberry.field
     async def schools(self) -> List[School]:

@@ -7,6 +7,7 @@ from strawberry.asgi import GraphQL as _GraphQL
 
 from app import models
 from app.schemas import agenda, auth
+from app.schemas.schema_types import User
 
 
 class GraphQL(_GraphQL):
@@ -35,7 +36,7 @@ class GraphQL(_GraphQL):
             .where(models.User.id == int(payload["sub"]))
             .first()
         )
-        return auth.User(**user) if user else None
+        return User(**user) if user else None
 
 
 @strawberry.type

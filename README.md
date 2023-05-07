@@ -4,14 +4,12 @@ The backend of [etml.burkhalter.dev](https://github.com/BurkhalterY/etml.burkhal
 
 ## Installation
 
-- Copy `config/settings.sample.toml` to `config/settings.toml` and change default settings.
+- Copy `.env.sample` to `.env` and change default settings.
 
 ```bash
 poetry install
 poetry shell
-piccolo migrations forwards user
 piccolo migrations forwards app
-poetry run init
 ```
 
 ## Run
@@ -19,19 +17,3 @@ poetry run init
 ```bash
 poetry run start
 ```
-
-## CLI
-
-Grant a user as admin:
-
-```bash
-poetry run grant me@mail.com
-```
-
-Ungrant a user:
-
-```bash
-poetry run ungrant me@mail.com
-```
-
-Note: grant and ungrant commands can support many users at the same time.

@@ -1,15 +1,17 @@
 from enum import Enum
 
-from piccolo.apps.user.tables import BaseUser as User
+from piccolo.apps.user.tables import BaseUser
 from piccolo.columns import (
+    M2M,
     Boolean,
     Date,
     Float,
     ForeignKey,
     Integer,
+    LazyTableReference,
     OnDelete,
     Serial,
-    Text,
+    Time,
     Varchar,
 )
 from piccolo.table import Table
@@ -21,18 +23,19 @@ from piccolo.table import Table
 # piccolo migrations forwards app
 
 
+class User(BaseUser, tablename="piccolo_user"):
+    is_public = Boolean()
+    threads_ids = M2M(LazyTableReference("Thread", module_path=__name__))
+    tasks_ids = M2M(LazyTableReference("Task", module_path=__name__))
+
+
 class Formation(Table):
     id = Serial(primary_key=True)
     name = Varchar()
+    title_m = Varchar()
+    title_f = Varchar()
     duration = Integer()
-
-
-class Matter(Table):
-    id = Serial(primary_key=True)
-    abbr = Varchar(unique=True, length=8)
-    name = Varchar()
-    short_name = Varchar()
-    parent_id = ForeignKey("self", on_delete=OnDelete.restrict)
+    eqf_level = Integer()
 
 
 class School(Table):
@@ -47,43 +50,46 @@ class School(Table):
     website = Varchar()
 
 
-class Promotion(Table):
+class Thread(Table):
     id = Serial(primary_key=True)
     formation_id = ForeignKey(Formation, on_delete=OnDelete.restrict)
     code = Varchar(length=8)
     school_id = ForeignKey(School, on_delete=OnDelete.restrict)
     year_start = Integer()
     year_end = Integer()
+    users_ids = M2M(LazyTableReference("User", module_path=__name__))
 
 
-class Profile(Table):
-    id = Serial(primary_key=True)
+class ThreadUser(Table):
+    thread_id = ForeignKey(Thread, on_delete=OnDelete.restrict)
     user_id = ForeignKey(User, on_delete=OnDelete.restrict)
-    promotion_id = ForeignKey(Promotion, on_delete=OnDelete.restrict)
-    year_start = Integer()
-    year_end = Integer()
-    is_public = Boolean()
 
 
-class Semester(Table):
+class Matter(Table):
     id = Serial(primary_key=True)
-    profile_id = ForeignKey(Profile)
-    number = Integer()
+    abbr = Varchar(unique=True, length=8)
+    name = Varchar()
+    short_name = Varchar()
+    parent_id = ForeignKey("self", on_delete=OnDelete.restrict)
 
 
 class Test(Table):
     id = Serial(primary_key=True)
-    promotion_id = ForeignKey(Promotion, on_delete=OnDelete.restrict)
+    thread_id = ForeignKey(Thread, on_delete=OnDelete.restrict)
     matter_id = ForeignKey(Matter, on_delete=OnDelete.restrict)
     title = Varchar()
-    content = Text()
+    semester = Integer()
+    tasks_ids = M2M(LazyTableReference("Task", module_path=__name__))
 
 
 class Grade(Table):
     id = Serial(primary_key=True)
-    semester_id = ForeignKey(Semester)
-    test_id = ForeignKey(Test, on_delete=OnDelete.restrict)
+    user_id = ForeignKey(User, on_delete=OnDelete.restrict)
     value = Float()
+    test_id = ForeignKey(Test, on_delete=OnDelete.restrict)
+    matter_id = ForeignKey(Matter, on_delete=OnDelete.restrict)
+    title = Varchar()
+    semester = Integer()
     date = Date()
 
 
@@ -92,26 +98,39 @@ class Task(Table):
         homework = "homework"
         test = "test"
         info = "info"
-        summary = "summary"
 
     id = Serial(primary_key=True)
+    thread_id = ForeignKey(Thread, on_delete=OnDelete.restrict)
     date = Date()
-    promotion_id = ForeignKey(Promotion, on_delete=OnDelete.restrict)
-    type = Varchar(length=16, choices=Type)
     matter_id = ForeignKey(Matter, on_delete=OnDelete.restrict)
+    type = Varchar(length=16, choices=Type)
     title = Varchar()
-    content = Text()
-    test_id = ForeignKey(Test, on_delete=OnDelete.restrict)
+    users_ids = M2M(LazyTableReference("User", module_path=__name__))
+    tests_ids = M2M(LazyTableReference("Test", module_path=__name__))
+
+
+class TaskUser(Table):
+    task_id = ForeignKey(Task, on_delete=OnDelete.restrict)
+    user_id = ForeignKey(User, on_delete=OnDelete.restrict)
+    done = Boolean()
+    at = Time()
+
+
+class TaskTest(Table):
+    task_id = ForeignKey(Task, on_delete=OnDelete.restrict)
+    test_id_id = ForeignKey(Test, on_delete=OnDelete.restrict)
 
 
 TABLES = [
     Formation,
     Grade,
     Matter,
-    Profile,
-    Promotion,
     School,
-    Semester,
     Task,
+    TaskTest,
+    TaskUser,
     Test,
+    Thread,
+    ThreadUser,
+    User,
 ]

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "etml-api"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 authors = ["Yannis Burkhalter <yannis@burkhalter.dev>"]
 readme = "README.md"
@@ -8,17 +8,13 @@ packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-piccolo = {extras = ["all"], version = "^0.109.0"}
+piccolo = {extras = ["postgres"], version = "^0.111.0"}
 strawberry-graphql = {extras = ["asgi"], version = "^0.156.4"}
 uvicorn = "^0.20.0"
 pyjwt = "^2.6.0"
-toml = "^0.10.2"
 
 [tool.poetry.scripts]
 start = "app.main:start"
-init = "app.cli:init"
-grant = "app.cli:grant"
-ungrant = "app.cli:ungrant"
 
 [build-system]
 requires = ["poetry-core"]
