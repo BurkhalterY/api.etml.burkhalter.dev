@@ -58,7 +58,7 @@ class User:
             .where((User._model.id == self.id) & User._model.is_public.eq(True))
             .first()
         )
-        return user.threads_ids if user else []
+        return user["threads_ids"] if user else []
 
     @strawberry.field
     async def threads(self) -> List["Thread"]:
@@ -67,7 +67,7 @@ class User:
             .where((User._model.id == self.id) & User._model.is_public.eq(True))
             .first()
         )
-        return [Thread(**thread) for thread in user.threads_ids] if user else []
+        return [Thread(**thread) for thread in user["threads_ids"]] if user else []
 
 
 @strawberry.type

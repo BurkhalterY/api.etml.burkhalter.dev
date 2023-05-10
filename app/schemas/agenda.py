@@ -6,7 +6,7 @@ import strawberry
 from strawberry.types import Info
 
 from app import models
-from app.schemas.schema_types import IsAdmin, Matter, Task, Thread
+from app.schemas.schema_types import IsAdmin, Matter, Task, Thread, User
 
 
 @strawberry.type
@@ -18,7 +18,6 @@ class Day:
 @strawberry.type
 class Week:
     threads: List[Thread]
-    include_self: bool
     number: int
     year: int
     date_from: date
@@ -32,8 +31,7 @@ class Query:
     async def week(
         self,
         info: Info,
-        threads: Optional[List[str]] = [],
-        include_self: Optional[bool] = False,
+        threads: Optional[List[str]] = None,
         number: Optional[int] = None,
         year: Optional[int] = None,
     ) -> Week:
@@ -49,7 +47,6 @@ class Query:
         friday = date.fromisocalendar(year, number, 5)
         sunday = date.fromisocalendar(year, number, 7)
 
-        db_threads = []
         if threads:
             db_threads = await Thread._model.select().where(
                 Thread._model.code.is_in(threads)
@@ -62,10 +59,20 @@ class Query:
                     == year
                 )
             )
+        else:
+            if info.context["user"]:
+                user = (
+                    await User._model.select(User._model.threads_ids())
+                    .where(User._model.id == info.context["user"].id)
+                    .first()
+                )
+                db_threads = user["threads_ids"]
+            else:
+                db_threads = []
         threads_ids = [thread["id"] for thread in db_threads]
 
         individual_tasks_ids = []
-        if include_self:
+        if info.context["user"] and (not threads or (threads and "self" in threads)):
             individual_tasks_ids = (
                 await models.TaskUser.select(models.TaskUser.task_id)
                 .where(
@@ -98,7 +105,6 @@ class Query:
 
         return Week(
             threads=[Thread(**thread) for thread in db_threads],
-            include_self=include_self,
             number=number,
             year=year,
             date_from=monday,

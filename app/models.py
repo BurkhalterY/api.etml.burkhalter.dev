@@ -25,8 +25,8 @@ from piccolo.table import Table
 
 class User(BaseUser, tablename="piccolo_user"):
     is_public = Boolean()
-    threads_ids = M2M(LazyTableReference("Thread", module_path=__name__))
-    tasks_ids = M2M(LazyTableReference("Task", module_path=__name__))
+    threads_ids = M2M(LazyTableReference("ThreadUser", module_path=__name__))
+    tasks_ids = M2M(LazyTableReference("TaskUser", module_path=__name__))
 
 
 class Formation(Table):
@@ -57,7 +57,7 @@ class Thread(Table):
     school_id = ForeignKey(School, on_delete=OnDelete.restrict)
     year_start = Integer()
     year_end = Integer()
-    users_ids = M2M(LazyTableReference("User", module_path=__name__))
+    users_ids = M2M(LazyTableReference("ThreadUser", module_path=__name__))
 
 
 class ThreadUser(Table):
@@ -79,7 +79,7 @@ class Test(Table):
     matter_id = ForeignKey(Matter, on_delete=OnDelete.restrict)
     title = Varchar()
     semester = Integer()
-    tasks_ids = M2M(LazyTableReference("Task", module_path=__name__))
+    tasks_ids = M2M(LazyTableReference("TaskTest", module_path=__name__))
 
 
 class Grade(Table):
@@ -105,8 +105,8 @@ class Task(Table):
     matter_id = ForeignKey(Matter, on_delete=OnDelete.restrict)
     type = Varchar(length=16, choices=Type)
     title = Varchar()
-    users_ids = M2M(LazyTableReference("User", module_path=__name__))
-    tests_ids = M2M(LazyTableReference("Test", module_path=__name__))
+    users_ids = M2M(LazyTableReference("TaskUser", module_path=__name__))
+    tests_ids = M2M(LazyTableReference("TaskTest", module_path=__name__))
 
 
 class TaskUser(Table):
