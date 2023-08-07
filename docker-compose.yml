@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     volumes:
-     - ./:/api
+      - ./:/api
   db:
     image: "postgres:15-alpine"
     ports:
