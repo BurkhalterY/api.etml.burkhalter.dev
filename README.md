@@ -4,8 +4,11 @@ The backend of [etml.burkhalter.dev](https://github.com/BurkhalterY/etml.burkhal
 
 ## Installation
 
-- Copy `database.sample.toml` to `database.toml` and configure access to database.
-- Copy `app/config/settings.sample.toml` to `app/config/settings.toml` and set environment to "dev" or "prod".
+- Copy `.env.sample` to `.env` and change default settings.
+  - `ENVIRONMENT`: `prod` or `dev`
+  - `WEB_PORT`: `8000` _(default)_
+  - `JWT_SECRET`: _generate a random JWT secret_
+  - `SQLITE_PATH`: `etml.db` _(default)_
 
 ```bash
 poetry install
@@ -35,4 +38,4 @@ Ungrant a user:
 poetry run ungrant me@mail.com
 ```
 
-Note: grant and ungrant commands can support many users at the same time.
+Note: `grant` and `ungrant` commands support many users at the same time.

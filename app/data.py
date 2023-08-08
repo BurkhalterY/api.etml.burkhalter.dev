@@ -39,7 +39,7 @@ DEFAULT_MATTERS = [
     Matter(
         abbr="mathspe",
         name="Mathématiques spécifiques",
-        short_name="Math sp.",
+        short_name="Math",
     ),
     Matter(
         abbr="hispol",
