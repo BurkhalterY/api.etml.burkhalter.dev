@@ -161,4 +161,4 @@ cython_debug/
 
 # etml.burkhalter.dev
 etml.db
-app/config/
+etml.sqlite
