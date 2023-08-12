@@ -1,4 +1,4 @@
-import os.path
+import os
 
 import uvicorn
 from dotenv import load_dotenv

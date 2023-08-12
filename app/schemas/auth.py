@@ -1,14 +1,18 @@
+import os
 from datetime import datetime
 from typing import Optional
 
 import jwt
 import strawberry
+from dotenv import load_dotenv
 from strawberry.types import Info
 
 from app.models import Profile, User
 from app.schemas import types
 
-SECRET = "secret"
+load_dotenv()
+SECRET = os.environ.get("JWT_SECRET", "")
+assert len(SECRET) >= 31
 
 
 def create_token(user_id):
