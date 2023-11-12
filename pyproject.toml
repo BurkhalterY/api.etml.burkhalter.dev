@@ -8,7 +8,7 @@ packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-piccolo = {extras = ["sqlite"], version = "^0.121"}
+piccolo = {extras = ["sqlite"], version = "^1.1"}
 strawberry-graphql = {extras = ["asgi"], version = "^0.199"}
 uvicorn = "^0.20"
 pyjwt = "^2.6"
