@@ -18,6 +18,8 @@ piccolo migrations forwards app
 poetry run init
 ```
 
+You can also use the [docker image](https://hub.docker.com/r/burkhaltery/api.etml.burkhalter.dev) from Docker Hub. In this case, you'll need to mount the SQLite db file.
+
 ## Run
 
 ```bash
