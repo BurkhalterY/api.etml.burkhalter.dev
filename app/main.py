@@ -4,8 +4,12 @@ import uvicorn
 from dotenv import load_dotenv
 from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import PlainTextResponse
 
 from app.schemas import GraphQL, schema
+
+async def status(request):
+    return PlainTextResponse("OK")
 
 load_dotenv()
 
@@ -17,6 +21,7 @@ IS_DEV = ENVIRONMENT == "dev"
 
 graphql_app = GraphQL(schema, graphiql=IS_DEV)
 app = Starlette()
+app.add_route("/status", status)
 app.add_route("/graphql", graphql_app)
 app.add_websocket_route("/graphql", graphql_app)
 app.add_middleware(
